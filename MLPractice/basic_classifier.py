@@ -14,7 +14,7 @@ clf = tree.DecisionTreeClassifier()
 clf.fit(X, Y)
 
 #predicting the gender based on a prediction
-prediction = clf.predict([62,7])
+prediction = clf.predict([68,9])
 
 #print the predicted gender
 print(prediction)
