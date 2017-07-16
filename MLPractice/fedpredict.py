@@ -6,7 +6,7 @@ f = 0
 c = 0
 
 #Array containing both players
-players = ["Federer","Cilic"]
+players = ["Cilic","Federer"]
 
 #Count
 x = 0
@@ -25,9 +25,11 @@ while(x<101):
 #Prints the winner of more random matches
 if c > f:
     print("The winner is Cilic!")
+    print(c)
 
 elif f > c:
     print("The winner is Federer!")
+    print(f)
 
 
 
