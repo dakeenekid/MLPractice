@@ -28,9 +28,8 @@ else:
 firstFrame = None
 
 # loop over the frames of the video
-x=1
 
-while x==1:
+while True:
 	# grab the current frame and initialize the occupied/unoccupied
 	# text
 	(grabbed, frame) = camera.read()
@@ -38,8 +37,7 @@ while x==1:
 
 	# if the frame could not be grabbed, then we have reached the end
 	# of the video
-	if not grabbed:
-		break
+
 
 	# resize the frame, convert it to grayscale, and blur it
 	frame = imutils.resize(frame, width=500)
@@ -59,7 +57,7 @@ while x==1:
 	# dilate the thresholded image to fill in holes, then find contours
 	# on thresholded image
 	thresh = cv2.dilate(thresh, None, iterations=2)
-	(cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
+	(__,cnts, _) = cv2.findContours(thresh.copy(), cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)
 
 	# loop over the contours
 	for c in cnts:
@@ -91,3 +89,5 @@ while x==1:
 
 # cleanup the camera and close any open windows
 camera.release()
+cv2.destroyAllWindows()
+
