@@ -1,77 +1,74 @@
-#Basic neural net that I am making from scratch. This is a step up from base_classifier, for I am using neural nets. This net is going to predict the likelyhood of a person being either male or female, based on shoe size and height.
-import numpy as np
-import tensorflow
-import pandas
-
-#Creating datasets
-
-#Each X entry is a person's shoe size followed by their height
-#Each Y entry is a person's odds of being a male. 100% indicates a man, and 0% indicates a woman.
-
-X = np.array(([10,65],[9,63],[70,12],[7,60],[7,63]) ,dtype=float)
-Y = np.array(([1],[0],[1],[1],[0],) ,dtype=float)
-
-#Scaling data
-
-X = X/np.amax(X, axis=0)
-Y = Y/100
-
-def sigmoid(z):
-    return 1 / (1 + np.exp(-z))
+from numpy import exp, array, random, dot
 
 
-class neuralNet(object):
+class NeuralNetwork():
     def __init__(self):
-        # Define Hyperparameters
-        self.inputLayerSize = 2
-        self.outputLayerSize = 1
-        self.hiddenLayerSize = 3
+        # Seed the random number generator, so it generates the same numbers
+        # every time the program runs.
+        random.seed(1)
 
-        # Weights (parameters)
-        self.W1 = np.random.randn(self.inputLayerSize, self.hiddenLayerSize)
-        self.W2 = np.random.randn(self.hiddenLayerSize, self.outputLayerSize)
+        # We model a single neuron, with 3 input connections and 1 output connection.
+        # We assign random weights to a 3 x 1 matrix, with values in the range -1 to 1
+        # and mean 0.
+        self.synaptic_weights = 2 * random.random((3, 1)) - 1
 
-    def forward(self, X):
-        # Propogate inputs though network
-        self.z2 = np.dot(X, self.W1)
-        self.a2 = self.sigmoid(self.z2)
-        self.z3 = np.dot(self.a2, self.W2)
-        yHat = self.sigmoid(self.z3)
-        return yHat
+    # The Sigmoid function, which describes an S shaped curve.
+    # We pass the weighted sum of the inputs through this function to
+    # normalise them between 0 and 1.
+    def __sigmoid(self, x):
+        return 1 / (1 + exp(-x))
 
-    def sigmoid(self, z):
-        # Apply sigmoid activation function to scalar, vector, or matrix
-        return 1 / (1 + np.exp(-z))
+    # The derivative of the Sigmoid function.
+    # This is the gradient of the Sigmoid curve.
+    # It indicates how confident we are about the existing weight.
+    def __sigmoid_derivative(self, x):
+        return x * (1 - x)
 
-    def sigmoidPrime(self, z):
-        # Gradient of sigmoid
-        return np.exp(-z) / ((1 + np.exp(-z)) ** 2)
+    # We train the neural network through a process of trial and error.
+    # Adjusting the synaptic weights each time.
+    def train(self, training_set_inputs, training_set_outputs, number_of_training_iterations):
+        for iteration in range(number_of_training_iterations):
+            # Pass the training set through our neural network (a single neuron).
+            output = self.think(training_set_inputs)
 
-    def costFunction(self, X, y):
-        # Compute cost for given X,y, use weights already stored in class.
-        self.yHat = self.forward(X)
-        J = 0.5 * sum((y - self.yHat) ** 2)
-        return J
+            # Calculate the error (The difference between the desired output
+            # and the predicted output).
+            error = training_set_outputs - output
 
-    def costFunctionPrime(self, X, y):
-        # Compute derivative with respect to W and W2 for a given X and y:
-        self.yHat = self.forward(X)
+            # Multiply the error by the input and again by the gradient of the Sigmoid curve.
+            # This means less confident weights are adjusted more.
+            # This means inputs, which are zero, do not cause changes to the weights.
+            adjustment = dot(training_set_inputs.T, error * self.__sigmoid_derivative(output))
 
-        delta3 = np.multiply(-(y - self.yHat), self.sigmoidPrime(self.z3))
-        dJdW2 = np.dot(self.a2.T, delta3)
+            # Adjust the weights.
+            self.synaptic_weights += adjustment
 
-        delta2 = np.dot(delta3, self.W2.T) * self.sigmoidPrime(self.z2)
-        dJdW1 = np.dot(X.T, delta2)
-
-        return dJdW1, dJdW2
-
-
-
-
-net = neuralNet()
-prediction = net.forward(X)
-cost1 = net.costFunction(X,Y)
-dJdW1, dJdW2 = net.costFunctionPrime(X,Y)
-print(dJdW2)
+    # The neural network thinks.
+    def think(self, inputs):
+        # Pass inputs through our neural network (our single neuron).
+        return self.__sigmoid(dot(inputs, self.synaptic_weights))
 
 
+if __name__ == "__main__":
+
+    #Intialise a single neuron neural network.
+    neural_network = NeuralNetwork()
+
+    print("Random starting synaptic weights: ")
+    print(neural_network.synaptic_weights)
+
+    # The training set. We have 4 examples, each consisting of 3 input values
+    # and 1 output value.
+    training_set_inputs = array([[0, 0, 1], [1, 1, 1], [1, 0, 1], [0, 1, 1]])
+    training_set_outputs = array([[0, 1, 1, 0]]).T
+
+    # Train the neural network using a training set.
+    # Do it 10,000 times and make small adjustments each time.
+    neural_network.train(training_set_inputs, training_set_outputs, 1000000)
+
+    print("New synaptic weights after training: ")
+    print(neural_network.synaptic_weights)
+
+    # Test the neural network with a new situation.
+    print("Considering new situation [1, 0, 0] -> ?: ")
+    print(neural_network.think(array([1, 0, 0])))
