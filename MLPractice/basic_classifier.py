@@ -19,3 +19,4 @@ prediction = clf.predict([68,9])
 #print the predicted gender
 print(prediction)
 
+print(clf.predict_proba("male"))
