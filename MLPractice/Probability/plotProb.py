@@ -13,7 +13,7 @@ def plot_prob(n,prob,r):
     sum_prob = 0
     values = np.array([]) # Array that stores all of our probabilities. It's empty upon initialization.
     ax = plt.subplot(111) # Sub-plot for text (not important)
-    # For loop that will run n+1 times, to account for 0
+    # For loop that will run n+1 times, to account for the last event
     for i in range(0,n+1):
         # Declare our co-efficient, which we can get using the binomial theorem
         # The comb function returns n choose i
@@ -39,16 +39,20 @@ def plot_prob(n,prob,r):
     # We need to reverse the order of the array, in order for the plot and the points to line up
     plt.plot(x, values[::-1])
     # Plot text in upper left of graph, showing correlation
-    text = "P of making at least {} shots: {}{}".format(r,round(sum_prob*100,4),"%")
-    ax.text(0.3,.9,text, ha='center',va='center',transform=ax.transAxes)
+    text = "P of making at least {} of {} shots: {}{}".format(r,n,round(sum_prob*100,4),"%")
+    ax.text(.35,.97,text, ha='center',va='center',transform=ax.transAxes)
 
     # Show the plot and label axis
     plt.xlabel("Shots Total")
     plt.ylabel("Probability")
+    # Vertical line showing value of r
     plt.axvline(x=r, c='r')
     plt.show()
 # Call our function to return the probability that out of 10 shots, at 85% per shot, Mr. Cole will
 # make 5 shots
 
-# Function call works like this: plot_prob(n, %chance per event, r)
-plot_prob(10,.9,8)
+# Function call works like this: plot_prob(# of total events, %chance per event, minimum value of true events)
+num_events = int(input("How many events are total? (Doing something x times) "))
+pct = float(input("What is the probability of each event happening? (50% coin flip, etc.) "))
+num_choices = int(input("How many times do you want said event to occur? (5 heads, etc.) "))
+plot_prob(num_events,pct,num_choices)
